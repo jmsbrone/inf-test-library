@@ -46,10 +46,11 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                'library/author' => 'library/create-author',
-                'library/author/<id:\d+>' => 'library/view-author',
-                'POST library/author/<id:\d+>' => 'library/update-author',
-                'POST library/author/<id:\d+>/delete' => 'library/delete-author',
+                'authors' => 'authors/list',
+                'authors/new' => 'authors/create',
+                'author/<id:\d+>' => 'authors/view',
+                'POST author/<id:\d+>' => 'authors/update',
+                'POST author/<id:\d+>/delete' => 'authors/delete',
             ],
         ],
 

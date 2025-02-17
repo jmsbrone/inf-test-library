@@ -43,7 +43,7 @@ $this->beginBody() ?>
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav'],
         'items' => [
-            ['label' => 'Authors', 'url' => ['/library/authors']],
+            ['label' => 'Authors', 'url' => ['/authors']],
             Yii::$app->user->isGuest
                 ? ['label' => 'Login', 'url' => ['/site/login']]
                 : '<li class="nav-item">'

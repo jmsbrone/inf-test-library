@@ -11,7 +11,7 @@ use yii\helpers\Url;
 ?>
 
 <h1>Authors</h1>
-<?= Html::a('Add author', Url::to(['library/author'])) ?>
+<?= Html::a('Add author', Url::to(['authors/new'])) ?>
 
 <?php
 foreach ($authors as $author): ?>
@@ -20,8 +20,8 @@ foreach ($authors as $author): ?>
             <?= $author->surname . ' ' . $author->name . ' ' . $author->last_name ?>
         </div>
         <div class="col-lg-3">
-            <?= Html::a('Edit', ['library/author', 'id' => $author->id]) ?>
-            <form action="<?= Url::to(['library/delete-author', 'id' => $author->id]) ?>" method="post">
+            <?= Html::a('Edit', ['authors/view', 'id' => $author->id]) ?>
+            <form action="<?= Url::to(['authors/delete', 'id' => $author->id]) ?>" method="post">
                 <?= Html::submitButton('Delete') ?>
                 <input type="hidden" name="_csrf" value="<?= Yii::$app->request->getCsrfToken() ?>"/>
             </form>

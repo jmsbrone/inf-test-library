@@ -13,7 +13,7 @@ use yii\widgets\ActiveForm;
 
 <div class="library-author-page">
     <h1><?= $author->id ? 'Editing' : 'Adding' ?> author</h1>
-    <?= Html::a('Back', ['library/authors']) ?>
+    <?= Html::a('Back', ['authors/list']) ?>
     <?php
     $form = ActiveForm::begin(['id' => 'author-form']);
     ?>

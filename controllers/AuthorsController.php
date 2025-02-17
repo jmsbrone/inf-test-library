@@ -12,7 +12,7 @@ use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
-class LibraryController extends Controller
+class AuthorsController extends Controller
 {
     public function __construct(
         $id,
@@ -41,21 +41,21 @@ class LibraryController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['authors', 'view-author'],
+                        'actions' => ['list', 'view'],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['update-author'],
+                        'actions' => ['update'],
                         'roles' => [$updateAuthorPermission],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['create-author'],
+                        'actions' => ['create'],
                         'roles' => [$createAuthorPermission],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['delete-author'],
+                        'actions' => ['delete'],
                         'roles' => [$deleteAuthorPermission],
                     ],
                 ],
@@ -67,7 +67,7 @@ class LibraryController extends Controller
      * @throws NotFoundHttpException
      * @throws UserException
      */
-    public function actionViewAuthor(int|null $id = null): string
+    public function actionView(int|null $id = null): string
     {
         if ($id !== null) {
             $author = Author::findOne(['id' => $id]);
@@ -78,21 +78,21 @@ class LibraryController extends Controller
             $author = new Author();
         }
 
-        return $this->render('author', ['author' => $author]);
+        return $this->render('detail', ['author' => $author]);
     }
 
-    public function actionCreateAuthor()
+    public function actionCreate()
     {
         $author = new Author();
         if ($this->request->getIsPost()) {
             $this->updateAuthorFromPost($author);
-            return $this->redirect(Url::to(['library/view-author', 'id' => $author->id]));
+            return $this->redirect(Url::to(['authors/view', 'id' => $author->id]));
         }
 
-        return $this->render('author', ['author' => $author]);
+        return $this->render('detail', ['author' => $author]);
     }
 
-    public function actionDeleteAuthor(int $id)
+    public function actionDelete(int $id)
     {
         $author = Author::findOne(['id' => $id]);
         if ($author === null) {
@@ -101,10 +101,10 @@ class LibraryController extends Controller
 
         $author->delete();
 
-        return $this->redirect(Url::to(['library/authors']));
+        return $this->redirect(Url::to(['authors/list']));
     }
 
-    public function actionUpdateAuthor()
+    public function actionUpdate()
     {
         $id = $this->request->post('id');
         $author = Author::findOne(['id' => $id]);
@@ -114,14 +114,14 @@ class LibraryController extends Controller
 
         $this->updateAuthorFromPost($author);
 
-        return $this->redirect(Url::to(['library/author', 'id' => $author->id]));
+        return $this->redirect(Url::to(['authors/view', 'id' => $author->id]));
     }
 
-    public function actionAuthors(): string
+    public function actionList(): string
     {
         $authors = Author::find()->all();
 
-        return $this->render('authors', ['authors' => $authors]);
+        return $this->render('list', ['authors' => $authors]);
     }
 
     /**
