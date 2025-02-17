@@ -1,6 +1,8 @@
 services:
   php:
-    image: php:8.2-fpm
+    build:
+      dockerfile: php.dockerfile
+      context: docker
     volumes:
       - ".:/var/www/html"
     links:
@@ -22,6 +24,7 @@ services:
     image: mysql:8.0
     volumes:
       - "db_storage:/var/lib/mysql"
+      - "./docker/db:/docker-entrypoint-initdb.d"
     environment:
       MYSQL_ROOT_PASSWORD: test
 
