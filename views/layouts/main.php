@@ -44,6 +44,7 @@ $this->beginBody() ?>
         'options' => ['class' => 'navbar-nav'],
         'items' => [
             ['label' => 'Authors', 'url' => ['/authors']],
+            ['label' => 'Books', 'url' => ['/books']],
             Yii::$app->user->isGuest
                 ? ['label' => 'Login', 'url' => ['/site/login']]
                 : '<li class="nav-item">'

@@ -17,8 +17,8 @@ class m250217_123105_create_books_table extends Migration
             'title' => $this->string(255)->notNull(),
             'year' => $this->integer(),
             'description' => $this->text(),
-            'isbn' => $this->string(255)->notNull(),
-            'cover_img_path' => $this->string(255)->notNull(),
+            'isbn' => $this->string(13)->notNull()->unique(),
+            'cover_img_path' => $this->string(255),
         ]);
     }
 

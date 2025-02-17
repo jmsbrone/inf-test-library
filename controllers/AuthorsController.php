@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\auth\PermissionNameFactoryInterface;
 use app\models\Author;
 use app\values\UserAction;
+use Yii;
 use yii\base\UserException;
 use yii\db\Exception;
 use yii\filters\AccessControl;
@@ -25,15 +26,9 @@ class AuthorsController extends Controller
 
     public function behaviors()
     {
-        $updateAuthorPermission = $this->permissionNameFactory->getName(
-            Author::PERMISSION_CATEGORY, UserAction::UPDATE,
-        );
-        $createAuthorPermission = $this->permissionNameFactory->getName(
-            Author::PERMISSION_CATEGORY, UserAction::CREATE,
-        );
-        $deleteAuthorPermission = $this->permissionNameFactory->getName(
-            Author::PERMISSION_CATEGORY, UserAction::DELETE,
-        );
+        $updateAuthorPermission = $this->getUpdatePermissionName();
+        $createAuthorPermission = $this->getCreatePermissionName();
+        $deleteAuthorPermission = $this->getDeletePermissionName();
 
         return [
             'access' => [
@@ -69,16 +64,12 @@ class AuthorsController extends Controller
      */
     public function actionView(int|null $id = null): string
     {
-        if ($id !== null) {
-            $author = Author::findOne(['id' => $id]);
-            if ($author === null) {
-                throw new NotFoundHttpException('Author not found');
-            }
-        } else {
-            $author = new Author();
-        }
+        $author = $this->getAuthorById($id);
 
-        return $this->render('detail', ['author' => $author]);
+        return $this->render('detail', [
+            'author' => $author,
+            'enableEdit' => Yii::$app->user->can($this->getUpdatePermissionName()),
+        ]);
     }
 
     public function actionCreate()
@@ -89,28 +80,24 @@ class AuthorsController extends Controller
             return $this->redirect(Url::to(['authors/view', 'id' => $author->id]));
         }
 
-        return $this->render('detail', ['author' => $author]);
+        return $this->render('detail', [
+            'author' => $author,
+            'enableEdit' => true,
+        ]);
     }
 
     public function actionDelete(int $id)
     {
-        $author = Author::findOne(['id' => $id]);
-        if ($author === null) {
-            throw new NotFoundHttpException('Author not found');
-        }
+        $author = $this->getAuthorById($id);
 
         $author->delete();
 
         return $this->redirect(Url::to(['authors/list']));
     }
 
-    public function actionUpdate()
+    public function actionUpdate(int $id)
     {
-        $id = $this->request->post('id');
-        $author = Author::findOne(['id' => $id]);
-        if ($author === null) {
-            throw new NotFoundHttpException('Author not found');
-        }
+        $author = $this->getAuthorById($id);
 
         $this->updateAuthorFromPost($author);
 
@@ -130,6 +117,7 @@ class AuthorsController extends Controller
      * @return void
      * @throws UserException
      * @throws Exception
+     * @throws \Exception
      */
     public function updateAuthorFromPost(Author $author): void
     {
@@ -138,6 +126,53 @@ class AuthorsController extends Controller
             throw new UserException('Invalid data: ' . json_encode($author->errors));
         }
 
-        $author->save();
+        if (!$author->save()) {
+            throw new \Exception('Could not save author: ' . json_encode($author->errors));
+        }
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return Author
+     * @throws NotFoundHttpException
+     */
+    public function getAuthorById(int $id): Author
+    {
+        $author = Author::findOne(['id' => $id]);
+        if ($author === null) {
+            throw new NotFoundHttpException('Author not found');
+        }
+        return $author;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUpdatePermissionName(): string
+    {
+        return $this->permissionNameFactory->getName(
+            Author::PERMISSION_CATEGORY, UserAction::UPDATE,
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreatePermissionName(): string
+    {
+        return $this->permissionNameFactory->getName(
+            Author::PERMISSION_CATEGORY, UserAction::CREATE,
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeletePermissionName(): string
+    {
+        return $this->permissionNameFactory->getName(
+            Author::PERMISSION_CATEGORY, UserAction::DELETE,
+        );
     }
 }

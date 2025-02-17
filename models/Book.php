@@ -2,10 +2,12 @@
 
 namespace app\models;
 
+use Exception;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "books".
@@ -37,10 +39,12 @@ class Book extends ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'isbn', 'cover_img_path'], 'required'],
+            [['title', 'isbn'], 'required'],
             [['year'], 'integer'],
-            [['description'], 'string'],
-            [['title', 'isbn', 'cover_img_path'], 'string', 'max' => 255],
+            [['description', 'cover_img_path'], 'string'],
+            [['title'], 'string', 'max' => 255],
+            [['isbn'], 'string', 'max' => 13],
+            [['isbn'], 'unique'],
         ];
     }
 
@@ -55,8 +59,19 @@ class Book extends ActiveRecord
             'year' => Yii::t('app', 'Year'),
             'description' => Yii::t('app', 'Description'),
             'isbn' => Yii::t('app', 'Isbn'),
-            'cover_img_path' => Yii::t('app', 'Cover Img Path'),
+            'cover_img_path' => Yii::t('app', 'Cover'),
         ];
+    }
+
+    public function uploadCover(UploadedFile $cover): string
+    {
+        $this->cover_img_path = '/uploads/' . $cover->baseName . '.' . $cover->extension;
+        $filePathToCover = '@app/web' . $this->cover_img_path;
+        if (!$cover->saveAs($filePathToCover)) {
+            throw new Exception('Error while saving cover');
+        }
+
+        return $filePathToCover;
     }
 
     /**

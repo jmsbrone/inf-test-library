@@ -48,9 +48,15 @@ $config = [
             'rules' => [
                 'authors' => 'authors/list',
                 'authors/new' => 'authors/create',
-                'author/<id:\d+>' => 'authors/view',
+                'GET author/<id:\d+>' => 'authors/view',
                 'POST author/<id:\d+>' => 'authors/update',
                 'POST author/<id:\d+>/delete' => 'authors/delete',
+
+                'books' => 'books/list',
+                'books/new' => 'books/create',
+                'GET book/<id:\d+>' => 'books/view',
+                'POST book/<id:\d+>' => 'books/update',
+                'POST book/<id:\d+>/delete' => 'books/delete',
             ],
         ],
 

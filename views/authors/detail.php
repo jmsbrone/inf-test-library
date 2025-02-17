@@ -5,6 +5,8 @@
 
 /** @var Author $author */
 
+/** @var bool $enableEdit */
+
 use app\models\Author;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -15,20 +17,27 @@ use yii\widgets\ActiveForm;
     <h1><?= $author->id ? 'Editing' : 'Adding' ?> author</h1>
     <?= Html::a('Back', ['authors/list']) ?>
     <?php
-    $form = ActiveForm::begin(['id' => 'author-form']);
+    $action = $author->isNewRecord ? 'authors/create' : 'authors/update';
+    $form = ActiveForm::begin([
+        'id' => 'author-form',
+        'action' => [$action, 'id' => $author->id],
+    ]);
     ?>
 
     <?= $form->field($author, 'surname') ?>
     <?= $form->field($author, 'name') ?>
     <?= $form->field($author, 'last_name') ?>
 
-    <div class="form-group">
-        <div>
-            <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
-        </div>
-    </div>
-
     <?php
+    if ($enableEdit) { ?>
+        <div class="form-group">
+            <div>
+                <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+            </div>
+        </div>
+
+        <?php
+    }
     ActiveForm::end();
     ?>
 
