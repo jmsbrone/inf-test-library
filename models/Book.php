@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "books".
@@ -18,14 +19,16 @@ use yii\db\ActiveQuery;
  *
  * @property Author[] $authors
  */
-class Book extends \yii\db\ActiveRecord
+class Book extends ActiveRecord
 {
+    public const PERMISSION_CATEGORY = 'Book';
+
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'books';
+        return '{{%books}}';
     }
 
     /**

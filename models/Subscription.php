@@ -22,7 +22,7 @@ class Subscription extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'subscriptions';
+        return '{{%subscriptions}}';
     }
 
     /**

@@ -20,12 +20,14 @@ use yii\db\ActiveRecord;
  */
 class Author extends ActiveRecord
 {
+    public const PERMISSION_CATEGORY = 'Author';
+
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'authors';
+        return '{{%authors}}';
     }
 
     /**

@@ -1,7 +1,6 @@
 <?php
 
 $params = require __DIR__ . '/params.php';
-$db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic-console',
@@ -10,7 +9,7 @@ $config = [
     'controllerNamespace' => 'app\commands',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
+        '@npm' => '@vendor/npm-asset',
         '@tests' => '@app/tests',
     ],
     'components' => [
@@ -25,9 +24,13 @@ $config = [
                 ],
             ],
         ],
-        'db' => $db,
+
+        ...(require_once __DIR__ . '/common_components.php'),
     ],
     'params' => $params,
+    'container' => [
+        'definitions' => require __DIR__ . '/di.php',
+    ],
     /*
     'controllerMap' => [
         'fixture' => [ // Fixture generation command line.

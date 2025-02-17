@@ -3,7 +3,6 @@
 use yii\symfonymailer\Mailer;
 
 $params = require __DIR__ . '/params.php';
-$db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
@@ -43,15 +42,19 @@ $config = [
                 ],
             ],
         ],
-        'db' => $db,
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
             ],
         ],
+
+        ...(require_once __DIR__ . '/common_components.php'),
     ],
     'params' => $params,
+    'container' => [
+        'definitions' => require __DIR__ . '/di.php',
+    ],
 ];
 
 if (YII_ENV_DEV) {
