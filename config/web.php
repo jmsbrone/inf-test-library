@@ -46,16 +46,26 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                /** @uses \app\controllers\AuthorsController::actionList() */
                 'authors' => 'authors/list',
+                /** @uses \app\controllers\AuthorsController::actionCreate() */
                 'authors/new' => 'authors/create',
+                /** @uses \app\controllers\AuthorsController::actionView() */
                 'GET author/<id:\d+>' => 'authors/view',
+                /** @uses \app\controllers\AuthorsController::actionUpdate() */
                 'POST author/<id:\d+>' => 'authors/update',
+                /** @uses \app\controllers\AuthorsController::actionDelete() */
                 'POST author/<id:\d+>/delete' => 'authors/delete',
 
+                /** @uses \app\controllers\BooksController::actionList() */
                 'books' => 'books/list',
+                /** @uses \app\controllers\BooksController::actionCreate() */
                 'books/new' => 'books/create',
+                /** @uses \app\controllers\BooksController::actionView() */
                 'GET book/<id:\d+>' => 'books/view',
+                /** @uses \app\controllers\BooksController::actionUpdate() */
                 'POST book/<id:\d+>' => 'books/update',
+                /** @uses \app\controllers\BooksController::actionDelete() */
                 'POST book/<id:\d+>/delete' => 'books/delete',
             ],
         ],
@@ -81,7 +91,7 @@ if (YII_ENV_DEV) {
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
-        'allowedIPs' => ['*'],
+        //'allowedIPs' => ['127.0.0.1', '::1'],
     ];
 }
 

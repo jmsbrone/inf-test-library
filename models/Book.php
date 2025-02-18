@@ -78,10 +78,18 @@ class Book extends ActiveRecord
         }
     }
 
+    /**
+     * Загрузка файла обложки с сохранением на диске.
+     *
+     * @param UploadedFile $cover
+     *
+     * @return string Путь к загруженному файлу
+     * @throws Exception
+     */
     public function uploadCover(UploadedFile $cover): string
     {
         $this->cover_img_path = '/uploads/' . $cover->baseName . '.' . $cover->extension;
-        $filePathToCover = '@app/web' . $this->cover_img_path;
+        $filePathToCover = $this->getFilePathToCover();
         if (!$cover->saveAs($filePathToCover)) {
             throw new Exception('Error while saving cover');
         }
@@ -101,6 +109,8 @@ class Book extends ActiveRecord
     }
 
     /**
+     * Отправка уведомлений о выходе книги.
+     *
      * @return void
      * @throws InvalidConfigException
      * @throws NotInstantiableException
@@ -111,10 +121,25 @@ class Book extends ActiveRecord
 
         $authors = $this->authors;
         foreach ($authors as $author) {
-            $subscriptions = Subscription::findAll(['author_id' => $author->id]);
-            foreach ($subscriptions as $subscription) {
+            foreach ($author->subscriptions as $subscription) {
                 $notifier->notify($this, $subscription);
             }
         }
+    }
+
+    /**
+     * Возвращает путь на диске к текущему файлу обложки.
+     *
+     * @return string|null
+     */
+    public function getFilePathToCover(): string|null
+    {
+        if (empty($this->cover_img_path)) {
+            $result = null;
+        } else {
+            $result = Yii::getAlias('@app/web') . $this->cover_img_path;
+        }
+
+        return $result;
     }
 }

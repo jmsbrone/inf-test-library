@@ -6,14 +6,20 @@ use app\auth\PermissionNameFactoryInterface;
 use app\models\Author;
 use app\models\Subscription;
 use app\values\UserAction;
+use Throwable;
 use Yii;
 use yii\base\UserException;
 use yii\db\Exception;
+use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
+/**
+ * Контроллер для CRUD операций с авторами.
+ */
 class AuthorsController extends Controller
 {
     public function __construct(
@@ -60,10 +66,14 @@ class AuthorsController extends Controller
     }
 
     /**
+     * Просмотр данных автора.
+     *
+     * @param int $id
+     *
+     * @return string
      * @throws NotFoundHttpException
-     * @throws UserException
      */
-    public function actionView(int|null $id = null): string
+    public function actionView(int $id): string
     {
         $author = $this->getAuthorById($id);
 
@@ -73,6 +83,13 @@ class AuthorsController extends Controller
         ]);
     }
 
+    /**
+     * Создание автора.
+     *
+     * @return string|Response
+     * @throws Exception
+     * @throws UserException
+     */
     public function actionCreate()
     {
         $author = new Author();
@@ -87,6 +104,16 @@ class AuthorsController extends Controller
         ]);
     }
 
+    /**
+     * Удаление автора.
+     *
+     * @param int $id
+     *
+     * @return Response
+     * @throws NotFoundHttpException
+     * @throws Throwable
+     * @throws StaleObjectException
+     */
     public function actionDelete(int $id)
     {
         $author = $this->getAuthorById($id);
@@ -96,6 +123,16 @@ class AuthorsController extends Controller
         return $this->redirect(Url::to(['authors/list']));
     }
 
+    /**
+     * Обновление данных автора.
+     *
+     * @param int $id
+     *
+     * @return Response
+     * @throws Exception
+     * @throws NotFoundHttpException
+     * @throws UserException
+     */
     public function actionUpdate(int $id)
     {
         $author = $this->getAuthorById($id);
@@ -105,6 +142,11 @@ class AuthorsController extends Controller
         return $this->redirect(Url::to(['authors/view', 'id' => $author->id]));
     }
 
+    /**
+     * Вывод списка авторов.
+     *
+     * @return string
+     */
     public function actionList(): string
     {
         $authors = Author::find()->all();
@@ -112,6 +154,13 @@ class AuthorsController extends Controller
         return $this->render('list', ['authors' => $authors]);
     }
 
+    /**
+     * Подписка пользователя на автора.
+     *
+     * @return Response
+     * @throws Exception
+     * @throws UserException
+     */
     public function actionSubscribe()
     {
         $subscription = new Subscription();
@@ -144,7 +193,7 @@ class AuthorsController extends Controller
      * @throws Exception
      * @throws \Exception
      */
-    public function updateAuthorFromPost(Author $author): void
+    protected function updateAuthorFromPost(Author $author): void
     {
         $loaded = $author->load($this->request->post());
         if (!$loaded || !$author->validate()) {
@@ -162,7 +211,7 @@ class AuthorsController extends Controller
      * @return Author
      * @throws NotFoundHttpException
      */
-    public function getAuthorById(int $id): Author
+    protected function getAuthorById(int $id): Author
     {
         $author = Author::findOne(['id' => $id]);
         if ($author === null) {
@@ -174,7 +223,7 @@ class AuthorsController extends Controller
     /**
      * @return string
      */
-    public function getUpdatePermissionName(): string
+    protected function getUpdatePermissionName(): string
     {
         return $this->permissionNameFactory->getName(
             Author::PERMISSION_CATEGORY,
@@ -185,7 +234,7 @@ class AuthorsController extends Controller
     /**
      * @return string
      */
-    public function getCreatePermissionName(): string
+    protected function getCreatePermissionName(): string
     {
         return $this->permissionNameFactory->getName(
             Author::PERMISSION_CATEGORY,
@@ -196,7 +245,7 @@ class AuthorsController extends Controller
     /**
      * @return string
      */
-    public function getDeletePermissionName(): string
+    protected function getDeletePermissionName(): string
     {
         return $this->permissionNameFactory->getName(
             Author::PERMISSION_CATEGORY,

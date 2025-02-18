@@ -8,14 +8,20 @@ use app\models\Author;
 use app\models\Book;
 use app\values\UserAction;
 use Exception;
+use Throwable;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\UserException;
+use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\helpers\Url;
 use yii\web\Controller;
+use yii\web\Response;
 use yii\web\UploadedFile;
 
+/**
+ * Контроллер для CRUD операций с книгами.
+ */
 class BooksController extends Controller
 {
     public function __construct(
@@ -61,6 +67,11 @@ class BooksController extends Controller
         ];
     }
 
+    /**
+     * Вывод списка книг с возможностью вывода по автору.
+     *
+     * @return string
+     */
     public function actionList()
     {
         $bookQuery = Book::find();
@@ -74,11 +85,20 @@ class BooksController extends Controller
         return $this->render('list', ['books' => $books]);
     }
 
+    /**
+     * Создание книги.
+     *
+     * @return string|Response
+     * @throws InvalidConfigException
+     * @throws UserException
+     * @throws \yii\db\Exception
+     */
     public function actionCreate()
     {
         $book = new Book();
         if ($this->request->getIsPost()) {
             $this->updateFromPost($book);
+
             return $this->redirect(Url::to(['books/view', 'id' => $book->id]));
         }
 
@@ -88,6 +108,16 @@ class BooksController extends Controller
         ]);
     }
 
+    /**
+     * Обновление данных книги.
+     *
+     * @param int $id
+     *
+     * @return Response
+     * @throws InvalidConfigException
+     * @throws UserException
+     * @throws \yii\db\Exception
+     */
     public function actionUpdate(int $id)
     {
         $book = $this->getBookById($id);
@@ -97,6 +127,14 @@ class BooksController extends Controller
         return $this->redirect(Url::to(['books/view', 'id' => $book->id]));
     }
 
+    /**
+     * Просмотр книги.
+     *
+     * @param int $id
+     *
+     * @return string
+     * @throws UserException
+     */
     public function actionView(int $id)
     {
         $book = $this->getBookById($id);
@@ -107,6 +145,16 @@ class BooksController extends Controller
         ]);
     }
 
+    /**
+     * Удаление книги.
+     *
+     * @param int $id
+     *
+     * @return Response
+     * @throws UserException
+     * @throws Throwable
+     * @throws StaleObjectException
+     */
     public function actionDelete(int $id)
     {
         $book = $this->getBookById($id);
@@ -130,28 +178,33 @@ class BooksController extends Controller
         $editForm = new EditBookForm();
         $editFormName = $editForm->formName();
 
-        $coverImgFile = UploadedFile::getInstance($editForm, 'cover_img');
-        if ($coverImgFile !== null) {
-            $savedCoverPath = $book->uploadCover($coverImgFile);
-        }
-
-        $data = $this->request->post();
-        $loaded = $book->load($data, $editFormName);
-        if (!$loaded || !$book->validate()) {
-            throw new UserException('Invalid data: ' . json_encode($book->errors));
-        }
-
         $transaction = Yii::$app->db->beginTransaction();
         try {
+            $coverImgFile = UploadedFile::getInstance($editForm, 'cover_img');
+            if ($coverImgFile !== null) {
+                $oldCoverPath = $book->getFilePathToCover();
+                $savedCoverPath = $book->uploadCover($coverImgFile);
+            }
+
+            $data = $this->request->post();
+            $loaded = $book->load($data, $editFormName);
+            if (!$loaded || !$book->validate()) {
+                throw new UserException('Invalid data: ' . json_encode($book->errors));
+            }
+
             if (!$book->save()) {
-                throw new Exception('Could not save book data: ' . json_encode($book->errors));
+                throw new Exception('Could not save book data');
+            }
+            if (isset($oldCoverPath)) {
+                unlink($oldCoverPath);
             }
 
             foreach ($book->authors as $author) {
                 $book->unlink('authors', $author, true);
             }
 
-            $newAuthors = Author::find()->where(['id' => $data[$editFormName]['authors']])->all();
+            $newAuthorIds = $data[$editFormName]['authors'];
+            $newAuthors = Author::find()->where(['id' => $newAuthorIds])->all();
             foreach ($newAuthors as $author) {
                 $book->link('authors', $author);
             }
