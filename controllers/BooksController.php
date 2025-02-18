@@ -63,7 +63,13 @@ class BooksController extends Controller
 
     public function actionList()
     {
-        $books = Book::find()->all();
+        $bookQuery = Book::find();
+        $author_id = $this->request->get('author');
+        if (!empty($author_id)) {
+            $bookQuery->joinWith('authors')->where(['{{%authors}}.id' => $author_id]);
+        }
+
+        $books = $bookQuery->all();
 
         return $this->render('list', ['books' => $books]);
     }

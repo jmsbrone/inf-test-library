@@ -21,6 +21,7 @@ foreach ($authors as $author): ?>
         </div>
         <div class="col-lg-3">
             <?= Html::a('Edit', ['authors/view', 'id' => $author->id]) ?>
+            <?= Html::a('Books', ['books/list', 'author' => $author->id]) ?>
             <form action="<?= Url::to(['authors/delete', 'id' => $author->id]) ?>" method="post">
                 <?= Html::submitButton('Delete') ?>
                 <input type="hidden" name="_csrf" value="<?= Yii::$app->request->getCsrfToken() ?>"/>
