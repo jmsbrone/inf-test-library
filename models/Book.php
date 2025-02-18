@@ -2,11 +2,13 @@
 
 namespace app\models;
 
+use app\notifications\NewBookNotifierInterface;
 use Exception;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\di\NotInstantiableException;
 use yii\web\UploadedFile;
 
 /**
@@ -63,6 +65,19 @@ class Book extends ActiveRecord
         ];
     }
 
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if (!$insert) {
+            return;
+        }
+
+        if (Yii::$container->has(NewBookNotifierInterface::class)) {
+            $this->sendNewBookNotifications();
+        }
+    }
+
     public function uploadCover(UploadedFile $cover): string
     {
         $this->cover_img_path = '/uploads/' . $cover->baseName . '.' . $cover->extension;
@@ -83,5 +98,23 @@ class Book extends ActiveRecord
     public function getAuthors()
     {
         return $this->hasMany(Author::class, ['id' => 'author_id'])->viaTable('{{%author_book}}', ['book_id' => 'id']);
+    }
+
+    /**
+     * @return void
+     * @throws InvalidConfigException
+     * @throws NotInstantiableException
+     */
+    public function sendNewBookNotifications(): void
+    {
+        $notifier = Yii::$container->get(NewBookNotifierInterface::class);
+
+        $authors = $this->authors;
+        foreach ($authors as $author) {
+            $subscriptions = Subscription::findAll(['author_id' => $author->id]);
+            foreach ($subscriptions as $subscription) {
+                $notifier->notify($this, $subscription);
+            }
+        }
     }
 }
