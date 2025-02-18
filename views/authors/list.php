@@ -1,7 +1,6 @@
 <?php
 
 /** @var yii\web\View $this */
-/** @var yii\bootstrap5\ActiveForm $form */
 
 /** @var app\models\Author[] $authors */
 
@@ -17,7 +16,7 @@ use yii\helpers\Url;
 foreach ($authors as $author): ?>
     <div class="row">
         <div class="col-lg-3">
-            <?= $author->surname . ' ' . $author->name . ' ' . $author->last_name ?>
+            <?= $author->getFullName() ?>
         </div>
         <div class="col-lg-3">
             <?= Html::a('Edit', ['authors/view', 'id' => $author->id]) ?>

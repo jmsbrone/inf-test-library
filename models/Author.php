@@ -74,4 +74,22 @@ class Author extends ActiveRecord
     {
         return $this->hasMany(Subscription::class, ['author_id' => 'id']);
     }
+
+    /**
+     * Получение ФИО автора
+     *
+     * @param bool $withInitials Отдача ФИО с инициалами вместо полного имени (прим. Иванов И.И.)
+     *
+     * @return string
+     */
+    public function getFullName(bool $withInitials = true): string
+    {
+        if ($withInitials) {
+            $secondNamePart= $this->name[0] . '.' . $this->last_name[0] . '.';
+        } else {
+            $secondNamePart = $this->name . ' ' . $this->last_name;
+        }
+
+        return $this->surname . ' ' . $secondNamePart;
+    }
 }
