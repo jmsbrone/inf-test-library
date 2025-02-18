@@ -16,7 +16,8 @@ class NewBookSMSNotifier implements NewBookNotifierInterface
 {
     public function __construct(
         protected NewBookNotificationPresenter $presenter,
-    ) { }
+    ) {
+    }
 
     /**
      * @param Book $book

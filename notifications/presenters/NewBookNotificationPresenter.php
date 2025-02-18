@@ -19,7 +19,7 @@ class NewBookNotificationPresenter
     public function getMessageText(Book $book): string
     {
         $authorNames = [];
-        foreach($book->authors as $author) {
+        foreach ($book->authors as $author) {
             $authorNames[] = $author->getFullName();
         }
         $authorNamesText = implode(', ', $authorNames);

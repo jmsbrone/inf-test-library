@@ -8,10 +8,21 @@ use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
+/**
+ * Контрллер для вывода рейтингов.
+ */
 class RatingsController extends Controller
 {
+    /**
+     * Количество записей в рейтинге топ авторов.
+     */
     public const TOP_COUNT = 10;
 
+    /**
+     * Вывод рейтинга топ авторов.
+     *
+     * @return string
+     */
     public function actionTop()
     {
         $query =

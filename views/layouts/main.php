@@ -43,9 +43,17 @@ $this->beginBody() ?>
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav'],
         'items' => [
+            /** @uses \app\controllers\AuthorsController::actionList() */
             ['label' => 'Authors', 'url' => ['/authors']],
+            /** @uses \app\controllers\BooksController::actionList() */
             ['label' => 'Books', 'url' => ['/books']],
+            /** @uses \app\controllers\RatingsController::actionTop() */
             ['label' => 'Top', 'url' => ['/ratings/top']],
+
+            /**
+             * @uses \app\controllers\SiteController::actionLogin()
+             * @uses \app\controllers\SiteController::actionLogout()
+             */
             Yii::$app->user->isGuest
                 ? ['label' => 'Login', 'url' => ['/site/login']]
                 : '<li class="nav-item">'
