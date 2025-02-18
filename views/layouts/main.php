@@ -66,10 +66,9 @@ $this->beginBody() ?>
 <main id="main" class="flex-shrink-0" role="main">
     <div class="container">
         <?php
-        if (!empty($this->params['breadcrumbs'])): ?>
+        if (!empty($this->params['breadcrumbs'])) : ?>
             <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-        <?php
-        endif ?>
+        <?php endif ?>
         <?= Alert::widget() ?>
         <?= $content ?>
     </div>

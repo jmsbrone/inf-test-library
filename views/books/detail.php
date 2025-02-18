@@ -1,7 +1,6 @@
 <?php
-/** @var yii\web\View $this */
-/** @var yii\bootstrap5\ActiveForm $form */
 
+/** @var yii\web\View $this */
 /** @var Book $book */
 
 /** @var bool $enableEdit */

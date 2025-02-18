@@ -12,8 +12,7 @@ use yii\helpers\Url;
 <h1>Authors</h1>
 <?= Html::a('Add author', Url::to(['authors/new'])) ?>
 
-<?php
-foreach ($authors as $author): ?>
+<?php foreach ($authors as $author) : ?>
     <div class="row">
         <div class="col-lg-3">
             <?= $author->getFullName() ?>
@@ -33,6 +32,5 @@ foreach ($authors as $author): ?>
             </form>
         </div>
     </div>
-<?php
-endforeach; ?>
+<?php endforeach; ?>
 

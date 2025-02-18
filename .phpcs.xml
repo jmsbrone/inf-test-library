@@ -1,0 +1,3 @@
+<ruleset name="custom sniffs">
+    <rule ref="PSR12"/>
+</ruleset>

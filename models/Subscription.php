@@ -34,7 +34,13 @@ class Subscription extends ActiveRecord
             [['author_id', 'phone_number'], 'required'],
             [['author_id'], 'integer'],
             [['phone_number'], 'string', 'max' => 255],
-            [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Author::class, 'targetAttribute' => ['author_id' => 'id']],
+            [
+                ['author_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Author::class,
+                'targetAttribute' => ['author_id' => 'id'],
+            ],
         ];
     }
 

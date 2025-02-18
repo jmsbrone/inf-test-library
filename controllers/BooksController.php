@@ -189,7 +189,8 @@ class BooksController extends Controller
     public function getUpdatePermissionName(): string
     {
         return $this->permissionNameFactory->getName(
-            Book::PERMISSION_CATEGORY, UserAction::UPDATE,
+            Book::PERMISSION_CATEGORY,
+            UserAction::UPDATE,
         );
     }
 
@@ -199,7 +200,8 @@ class BooksController extends Controller
     public function getCreatePermissionName(): string
     {
         return $this->permissionNameFactory->getName(
-            Book::PERMISSION_CATEGORY, UserAction::CREATE,
+            Book::PERMISSION_CATEGORY,
+            UserAction::CREATE,
         );
     }
 
@@ -209,7 +211,8 @@ class BooksController extends Controller
     public function getDeletePermissionName(): string
     {
         return $this->permissionNameFactory->getName(
-            Book::PERMISSION_CATEGORY, UserAction::DELETE,
+            Book::PERMISSION_CATEGORY,
+            UserAction::DELETE,
         );
     }
 }

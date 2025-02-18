@@ -1,7 +1,6 @@
 <?php
 
 /** @var yii\web\View $this */
-/** @var yii\bootstrap5\ActiveForm $form */
 
 /** @var Book[] $books */
 
@@ -15,8 +14,7 @@ use yii\helpers\Url;
 <h1>Books</h1>
 <?= Html::a('Add', Url::to(['books/new'])) ?>
 
-<?php
-foreach ($books as $book): ?>
+<?php foreach ($books as $book) : ?>
     <div class="row">
         <div class="col-lg-3">
             <img src="<?= $book->cover_img_path ?>" class="img-thumbnail">
@@ -35,5 +33,4 @@ foreach ($books as $book): ?>
             </form>
         </div>
     </div>
-<?php
-endforeach; ?>
+<?php endforeach; ?>

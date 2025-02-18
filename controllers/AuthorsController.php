@@ -177,7 +177,8 @@ class AuthorsController extends Controller
     public function getUpdatePermissionName(): string
     {
         return $this->permissionNameFactory->getName(
-            Author::PERMISSION_CATEGORY, UserAction::UPDATE,
+            Author::PERMISSION_CATEGORY,
+            UserAction::UPDATE,
         );
     }
 
@@ -187,7 +188,8 @@ class AuthorsController extends Controller
     public function getCreatePermissionName(): string
     {
         return $this->permissionNameFactory->getName(
-            Author::PERMISSION_CATEGORY, UserAction::CREATE,
+            Author::PERMISSION_CATEGORY,
+            UserAction::CREATE,
         );
     }
 
@@ -197,7 +199,8 @@ class AuthorsController extends Controller
     public function getDeletePermissionName(): string
     {
         return $this->permissionNameFactory->getName(
-            Author::PERMISSION_CATEGORY, UserAction::DELETE,
+            Author::PERMISSION_CATEGORY,
+            UserAction::DELETE,
         );
     }
 }

@@ -85,7 +85,7 @@ class Author extends ActiveRecord
     public function getFullName(bool $withInitials = true): string
     {
         if ($withInitials) {
-            $secondNamePart= $this->name[0] . '.' . $this->last_name[0] . '.';
+            $secondNamePart = $this->name[0] . '.' . $this->last_name[0] . '.';
         } else {
             $secondNamePart = $this->name . ' ' . $this->last_name;
         }
