@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\notifications\NewBookNotifierInterface;
 use Exception;
+use Throwable;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
@@ -122,7 +123,11 @@ class Book extends ActiveRecord
         $authors = $this->authors;
         foreach ($authors as $author) {
             foreach ($author->subscriptions as $subscription) {
-                $notifier->notify($this, $subscription);
+                try {
+                    $notifier->notify($this, $subscription);
+                } catch (Throwable) {
+                    // ошибки отправки уведомления игнорируем
+                }
             }
         }
     }
