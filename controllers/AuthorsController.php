@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\auth\PermissionNameFactoryInterface;
 use app\models\Author;
+use app\models\Subscription;
 use app\values\UserAction;
 use Yii;
 use yii\base\UserException;
@@ -36,7 +37,7 @@ class AuthorsController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['list', 'view'],
+                        'actions' => ['list', 'view', 'subscribe'],
                     ],
                     [
                         'allow' => true,
@@ -109,6 +110,30 @@ class AuthorsController extends Controller
         $authors = Author::find()->all();
 
         return $this->render('list', ['authors' => $authors]);
+    }
+
+    public function actionSubscribe()
+    {
+        $subscription = new Subscription();
+        $loaded = $subscription->load($this->request->post(), '');
+        if (!$loaded || !$subscription->validate()) {
+            throw new UserException('Invalid data: ' . json_encode($subscription->errors));
+        }
+
+        $subscriptionExists = Subscription::find()
+            ->where([
+                'author_id' => $subscription->author_id,
+                'phone_number' => $subscription->phone_number,
+            ])
+            ->exists();
+
+        if ($subscriptionExists) {
+            throw new UserException('Already subscribed');
+        } elseif (!$subscription->save()) {
+            throw new \Exception('Could not save subscription: ' . json_encode($subscription->errors));
+        }
+
+        return $this->redirect(Url::to(['authors/list']));
     }
 
     /**

@@ -22,6 +22,12 @@ foreach ($authors as $author): ?>
         <div class="col-lg-3">
             <?= Html::a('Edit', ['authors/view', 'id' => $author->id]) ?>
             <?= Html::a('Books', ['books/list', 'author' => $author->id]) ?>
+            <form action="<?= Url::to(['authors/subscribe']) ?>" method="post">
+                <input type="hidden" name="_csrf" value="<?= Yii::$app->request->getCsrfToken() ?>"/>
+                <input type="hidden" name="author_id" value="<?= $author->id ?>"/>
+                <input type="text" name="phone_number" value=""/>
+                <?= Html::submitButton('Subscribe') ?>
+            </form>
             <form action="<?= Url::to(['authors/delete', 'id' => $author->id]) ?>" method="post">
                 <?= Html::submitButton('Delete') ?>
                 <input type="hidden" name="_csrf" value="<?= Yii::$app->request->getCsrfToken() ?>"/>
