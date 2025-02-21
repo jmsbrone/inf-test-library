@@ -169,16 +169,7 @@ class AuthorsController extends Controller
             throw new UserException('Invalid data: ' . json_encode($subscription->errors));
         }
 
-        $subscriptionExists = Subscription::find()
-            ->where([
-                'author_id' => $subscription->author_id,
-                'phone_number' => $subscription->phone_number,
-            ])
-            ->exists();
-
-        if ($subscriptionExists) {
-            throw new UserException('Already subscribed');
-        } elseif (!$subscription->save()) {
+        if (!$subscription->save()) {
             throw new \Exception('Could not save subscription: ' . json_encode($subscription->errors));
         }
 

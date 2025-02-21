@@ -56,6 +56,22 @@ class Subscription extends ActiveRecord
         ];
     }
 
+    public function validate($attributeNames = null, $clearErrors = true)
+    {
+        $subscriptionExists = self::find()
+            ->where([
+                'author_id' => $this->author_id,
+                'phone_number' => $this->phone_number,
+            ])
+            ->exists();
+
+        if ($subscriptionExists) {
+            $this->addError('phone_number','Already subscribed');
+        }
+
+        return parent::validate($attributeNames, false);
+    }
+
     /**
      * Gets query for [[Author]].
      *

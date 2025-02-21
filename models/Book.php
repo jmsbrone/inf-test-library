@@ -10,6 +10,7 @@ use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\di\NotInstantiableException;
+use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 
 /**
@@ -27,6 +28,9 @@ use yii\web\UploadedFile;
 class Book extends ActiveRecord
 {
     public const PERMISSION_CATEGORY = 'Book';
+
+    protected ?UploadedFile $newCover = null;
+    protected ?array $newAuthorIds = null;
 
     /**
      * {@inheritdoc}
@@ -70,6 +74,34 @@ class Book extends ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
+        if (isset($this->newCover) && isset($changedAttributes['cover_img_path'])) {
+            $oldCoverPath = $this->getFilePathToCover($changedAttributes['cover_img_path']);
+            if (file_exists($oldCoverPath)) {
+                unlink($oldCoverPath);
+            }
+            unset($this->newCover);
+        }
+
+        if (isset($this->newAuthorIds)) {
+            $currentAuthors = ArrayHelper::index($this->authors, 'id');
+            $newAuthors = Author::find()->where(['id' => $this->newAuthorIds])->all();
+            $newAuthors = ArrayHelper::index($newAuthors, 'id');
+
+            foreach($newAuthors as $newAuthor) {
+                if (!isset($currentAuthors[$newAuthor->id])) {
+                    $this->link('authors', $newAuthor);
+                } else {
+                    unset($currentAuthors[$newAuthor->id]);
+                }
+            }
+
+            foreach($currentAuthors as $currentAuthor) {
+                $this->unlink('authors', $currentAuthor, true);
+            }
+
+            unset($this->newAuthorIds);
+        }
+
         if (!$insert) {
             return;
         }
@@ -79,23 +111,46 @@ class Book extends ActiveRecord
         }
     }
 
+    public function beforeSave($insert)
+    {
+        $parentResult = parent::beforeSave($insert);
+        if (!$parentResult) {
+            return $parentResult;
+        }
+
+        if (isset($this->newCover)) {
+            $this->cover_img_path = '/uploads/' . $this->newCover->baseName . '.' . $this->newCover->extension;
+            $filePathToCover = $this->getFilePathToCover();
+            if (!$this->newCover->saveAs($filePathToCover)) {
+                throw new Exception('Error while saving cover');
+            }
+        }
+
+        return $parentResult;
+    }
+
     /**
-     * Загрузка файла обложки с сохранением на диске.
+     * Выставление файла новой обложки.
      *
      * @param UploadedFile $cover
      *
-     * @return string Путь к загруженному файлу
-     * @throws Exception
+     * @return void Путь к загруженному файлу
      */
-    public function uploadCover(UploadedFile $cover): string
+    public function setCover(UploadedFile $cover): void
     {
-        $this->cover_img_path = '/uploads/' . $cover->baseName . '.' . $cover->extension;
-        $filePathToCover = $this->getFilePathToCover();
-        if (!$cover->saveAs($filePathToCover)) {
-            throw new Exception('Error while saving cover');
-        }
+        $this->newCover = $cover;
+    }
 
-        return $filePathToCover;
+    /**
+     * Установка новых авторов.
+     *
+     * @param array $ids
+     *
+     * @return void
+     */
+    public function setNewAuthors(array $ids): void
+    {
+        $this->newAuthorIds = $ids;
     }
 
     /**
@@ -135,14 +190,19 @@ class Book extends ActiveRecord
     /**
      * Возвращает путь на диске к текущему файлу обложки.
      *
+     * @param string|null $relativeCoverPath
+     *
      * @return string|null
      */
-    public function getFilePathToCover(): string|null
+    public function getFilePathToCover(?string $relativeCoverPath = null): string|null
     {
-        if (empty($this->cover_img_path)) {
+        if (!isset($relativeCoverPath)) {
+            $relativeCoverPath = $this->cover_img_path;
+        }
+        if (empty($relativeCoverPath)) {
             $result = null;
         } else {
-            $result = Yii::getAlias('@app/web') . $this->cover_img_path;
+            $result = Yii::getAlias('@app/web') . $relativeCoverPath;
         }
 
         return $result;

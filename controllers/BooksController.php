@@ -4,7 +4,6 @@ namespace app\controllers;
 
 use app\auth\PermissionNameFactoryInterface;
 use app\forms\EditBookForm;
-use app\models\Author;
 use app\models\Book;
 use app\values\UserAction;
 use Exception;
@@ -178,46 +177,21 @@ class BooksController extends Controller
         $editForm = new EditBookForm();
         $editFormName = $editForm->formName();
 
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-            $coverImgFile = UploadedFile::getInstance($editForm, 'cover_img');
-            if ($coverImgFile !== null) {
-                $oldCoverPath = $book->getFilePathToCover();
-                $savedCoverPath = $book->uploadCover($coverImgFile);
-            }
+        $coverImgFile = UploadedFile::getInstance($editForm, 'cover_img');
+        if ($coverImgFile) {
+            $book->setCover($coverImgFile);
+        }
 
-            $data = $this->request->post();
-            $loaded = $book->load($data, $editFormName);
-            if (!$loaded || !$book->validate()) {
-                throw new UserException('Invalid data: ' . json_encode($book->errors));
-            }
+        $data = $this->request->post();
+        $book->setNewAuthors($data[$editFormName]['authors']);
 
-            if (!$book->save()) {
-                throw new Exception('Could not save book data');
-            }
-            if (isset($oldCoverPath)) {
-                unlink($oldCoverPath);
-            }
+        $loaded = $book->load($data, $editFormName);
+        if (!$loaded || !$book->validate()) {
+            throw new UserException('Invalid data: ' . json_encode($book->errors));
+        }
 
-            foreach ($book->authors as $author) {
-                $book->unlink('authors', $author, true);
-            }
-
-            $newAuthorIds = $data[$editFormName]['authors'];
-            $newAuthors = Author::find()->where(['id' => $newAuthorIds])->all();
-            foreach ($newAuthors as $author) {
-                $book->link('authors', $author);
-            }
-
-            $transaction->commit();
-        } catch (Exception $e) {
-            $transaction->rollBack();
-
-            if (isset($savedCoverPath)) {
-                unlink($savedCoverPath);
-            }
-
-            throw $e;
+        if (!$book->save()) {
+            throw new Exception('Could not save book data');
         }
     }
 
